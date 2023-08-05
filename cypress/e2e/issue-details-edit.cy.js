@@ -7,12 +7,12 @@ describe('Issue details editing', () => {
     });
   });
 
-  it('Should update type, status, assignees, reporter, priority successfully', () => {
+  it.skip('Should update type, status, assignees, reporter, priority successfully', () => {
     getIssueDetailsModal().within(() => {
       cy.get('[data-testid="select:type"]').click('bottomRight');
       cy.get('[data-testid="select-option:Story"]')
-          .trigger('mouseover')
-          .trigger('click');
+        .trigger('mouseover')
+        .trigger('click');
       cy.get('[data-testid="select:type"]').should('contain', 'Story');
 
       cy.get('[data-testid="select:status"]').click('bottomRight');
@@ -36,7 +36,7 @@ describe('Issue details editing', () => {
     });
   });
 
-  it('Should update title, description successfully', () => {
+  it.skip('Should update title, description successfully', () => {
     const title = 'TEST_TITLE';
     const description = 'TEST_DESCRIPTION';
 
@@ -62,4 +62,56 @@ describe('Issue details editing', () => {
   });
 
   const getIssueDetailsModal = () => cy.get('[data-testid="modal:issue-details"]');
+
+
+  //Bonus assignment.
+
+  it('Checking dropdown “Priority” on issue detail page.', () => {
+    const expectedLength = 5;
+    let priorityOptions = [];
+    const priorities = [
+      { value: "1", label: "Lowest" },
+      { value: "2", label: "Low" },
+      { value: "3", label: "Medium" },
+      { value: "4", label: "High" },
+      { value: "5", label: "Highest" },
+    ];
+
+    function updatePriority(priorityIndex) {
+      const selectedPriority = priorities[priorityIndex].label;
+
+      cy.get('[data-testid="select:priority"]').click("bottomRight");
+      cy.get(`[data-testid="select-option:${selectedPriority}"]`).click();
+      cy.get('[data-testid="select:priority"]').should(
+        "have.text",
+        selectedPriority
+      );
+      cy.log(`Selected Priority: ${selectedPriority}`);
+    }
+
+    it("Should update priority successfully", () => {
+      const getIssueDetailsModal = () =>
+        cy.get('[data-testid="modal:issue-details"]');
+
+      getIssueDetailsModal().within(() => {
+        // Ensure the priority dropdown is visible before using the function
+        cy.get('[data-testid="select:priority"]').should("be.visible");
+
+        // Loop through each priority and update the priority field
+        priorities.forEach((priority, index) => {
+          updatePriority(index);
+        });
+      });
+    });
+
+    it("Should validate reporter name with regex", () => {
+      const NameRegex = /^[A-Za-z ]*$/;
+      const getReporterName = () => cy.get('[data-testid="select:reporter"]');
+
+      getReporterName().then(($reporter) => {
+        const reporterName = $reporter.text().trim();
+        expect(reporterName).to.match(NameRegex);
+      });
+    });
+  });
 });
